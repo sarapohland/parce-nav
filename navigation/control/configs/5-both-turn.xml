@@ -1,0 +1,89 @@
+<?xml version="1.0" ?>
+<config>
+    <environment>
+        <xI x="0.0" y="0.0" th="0.0"/>
+        <xG x="4.7" y="5" th="0.0"/>
+        <randGoal enabled="False">
+            <min x="-8" y="-8"/>
+            <max x="8" y="8"/>
+            <min_dist value="1.5"/>
+            <max_dist value="5.0"/>
+            <max_theta value="3.14"/>
+        </randGoal>
+        <global_waypoints enabled="True">
+            <waypoint_file value="/home/sara/competent-control/navigation/control/wypts/astro1.csv"/>
+        </global_waypoints>
+        <local_waypoints enabled="False">
+            <waypoint_file value="None"/>
+        </local_waypoints>
+        <thresh value="0.25"/>
+        <use_sim enabled="True"/>
+        <vehicle name="husky" width="0.3" length="0.4"/>
+        <time_limit value="90.0"/>
+        <max_theta value="0.25"/>
+    </environment>
+
+    <topics>
+        <odom_topic value="/gazebo/model_states"/>
+        <img_topic value="/mast_camera/image_raw"/>
+        <cmd_topic value="/husky_velocity_controller/cmd_vel"/>
+        <clk_topic value="/clock"/>
+        <coll_topic value="/gazebo/contact/base_link"/>
+    </topics>
+
+    <classifier>
+        <model value="/home/sara/competent-control/models/lunar-nav/classify/"/>
+    </classifier>
+
+    <competency>
+        <overall enabled="True">
+            <error_thresh value="0.8"/>
+            <decoder_dir value="/home/sara/competent-control/models/lunar-nav/reconstruct/"/>
+        </overall>
+        <regional enabled="True">
+            <error_thresh value="0.8"/>
+            <decoder_dir value="/home/sara/competent-control/models/lunar-nav/inpaint/"/>
+            <smooth method='avg' kernel="31" stride="1" pad="15"/>
+            <mask height="0" base1="80" base2="160" pad="100"/>
+            <turn_only enabled="True"/>
+        </regional>
+    </competency>
+
+    <controller>
+        <dynamics>
+            <file value="/home/sara/competent-control/dynamics/husky-20.p"/>
+        </dynamics>
+        <control>
+            <u_low lin="0.0" ang="-0.4"/> 
+            <u_high lin="0.8" ang="0.4"/>
+            <cmd_rate value="10.0"/>
+            <cmd_time value="2.0"/>
+            <backup_time value="1.0"/>
+            <turn_time value="1.0"/>
+            <error_time value="5.0"/>
+        </control>
+        <planning>
+            <N value="128"/>
+            <H value="60"/>
+            <max_goal xmax="8.0"/> 
+            <camera_scaling value="0.41"/>
+        </planning>
+        <rewards>
+            <goal weight="0.0" alpha="0.0" alphaf="1.0"/>
+            <goalx weight="-1.0" alpha="0.0" alphaf="1.0"/>
+            <goaly weight="-1.5" alpha="0.0" alphaf="1.0"/>
+            <path weight="0.0" alpha="0.0" alphaf="0.0"/>
+            <angle weight="-3.0" alpha="0.0" alphaf="1.0"/>
+            <dist weight="0.0" alpha="1.0" alphaf="1.0"/>
+        </rewards>
+        <tracking>
+            <state_cost x="1.0" y="1.0" theta="2.0" vel="0.5" turn="0.0"/>
+            <input_cost lin="0.1" ang="0.1"/>
+        </tracking>
+    </controller>
+
+    <camera>
+        <size channels="3" height="240" width="320"/>
+    </camera>
+
+</config>
