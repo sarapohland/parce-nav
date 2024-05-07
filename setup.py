@@ -1,15 +1,22 @@
 from setuptools import setup, find_packages
 
-requirements = ['numpy',
+requirements = ['bagpy',
+                'cvxpy',
+                'numpy',
                 'matplotlib',
+                'moviepy',
                 'opencv-python',
                 'pandas',
                 'Pillow',
+                'pyyaml',
+                'rosnumpy',
+                'rospkg',
                 'scikit-image',
                 'scikit-learn',
                 'scipy',
                 'seaborn',
                 'shapely',
+                'tabulate',
                 'torch',
                 'torchvision',
                 'tqdm'] 

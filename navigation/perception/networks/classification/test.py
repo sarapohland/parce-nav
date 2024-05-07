@@ -23,7 +23,7 @@ def test(dataloader, model, device):
     with torch.no_grad():
         for X, y in dataloader:
             X, y = X.to(device), y.to(device)
-            pred = torch.argmax(model(X), dim=1)
+            pred = torch.argmax(model(X), dim=1).cpu()
             true = torch.Tensor([int(yi.item()) for yi in y])
             trues.append(true)
             preds.append(pred)
@@ -33,6 +33,7 @@ def main():
     parser = argparse.ArgumentParser('Parse configuration file')
     parser.add_argument('--test_data', type=str, default='lunar-nav')
     parser.add_argument('--model_dir', type=str, default='model/classify/')
+    parser.add_argument('--use_gpu', action='store_true')
     args = parser.parse_args()
 
     # Load trained model
@@ -45,8 +46,8 @@ def main():
     test_loader = setup_loader(args.test_data, val=True)
 
     # Test model performance
-    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-    true, pred = test(test_loader, model, device)
+    device = torch.device("cuda:0" if torch.cuda.is_available() and args.use_gpu else "cpu")
+    true, pred = test(test_loader, model.to(device), device)
     accuracy = get_accurary(true, pred)
 
     # Plot confusion matrix

@@ -19,6 +19,7 @@ def main():
     parser.add_argument('--test_data', type=str, default='lunar-nav')
     parser.add_argument('--model_dir', type=str, default='model/classify/')
     parser.add_argument('--decoder_dir', type=str, default='model/reconstruct/')
+    parser.add_argument('--use_gpu', action='store_true')
     args = parser.parse_args()
 
     # Load trained perception model
@@ -31,6 +32,8 @@ def main():
     # Load trained competency estimator
     file = os.path.join(args.decoder_dir, 'parce.p')
     estimator = pickle.load(open(file, 'rb'))
+    device = torch.device("cuda:0" if torch.cuda.is_available() and args.use_gpu else "cpu")
+    estimator.set_device(device)
 
     # Overall competency estimation with reconstruction model
     if args.method == 'overall':
@@ -112,7 +115,7 @@ def main():
         ood_test_loader = setup_loader(args.test_data, ood=True, batch_size=1)
 
         # Set smoothing parameters
-        estimator.set_smoothing(1, 1, 0) # TEMPORARY!
+        estimator.set_smoothing(method='none')
 
         # Collect data from ID test set
         id_imgs, id_labels, id_scores = [], [], []

@@ -42,9 +42,9 @@ def test(dataloader, model, decoder, device, method='reconstruct', architect='de
                 raise NotImplementedError('Unknown model architecture.')
 
             # Save input, label, and prediction
-            inputs.append(input)
+            inputs.append(input.cpu())
             labels.append(true)
-            preds.append(pred)
+            preds.append(pred.cpu())
     return torch.concatenate(inputs), torch.concatenate(labels), torch.concatenate(preds)
 
 def main():
@@ -54,6 +54,7 @@ def main():
     parser.add_argument('--test_data', type=str, default='lunar-nav')
     parser.add_argument('--model_dir', type=str, default='model/classify/')
     parser.add_argument('--decoder_dir', type=str, default='model/reconstruct/')
+    parser.add_argument('--use_gpu', action='store_true')
     args = parser.parse_args()
 
     # Load trained perception model
@@ -86,8 +87,8 @@ def main():
     test_loader = setup_loader(args.test_data, batch_size=1, val=True, params=seg_params)
 
     # Get model predictions for ID data
-    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-    inputs, labels, preds = test(test_loader, model, decoder, device, args.method, args.architecture)
+    device = torch.device("cuda:0" if torch.cuda.is_available() and args.use_gpu else "cpu")
+    inputs, labels, preds = test(test_loader, model.to(device), decoder.to(device), device, args.method, args.architecture)
 
     # Save reconstructed images
     output_dir = os.path.join(args.decoder_dir, 'reconstruction')

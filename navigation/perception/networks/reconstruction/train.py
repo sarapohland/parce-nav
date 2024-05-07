@@ -98,6 +98,7 @@ def main():
     parser.add_argument('--train_config', type=str, default='navigation/perception/networks/reconstruction/train.config')
     parser.add_argument('--network_file', type=str, default='navigation/perception/networks/reconstruction/layers.json')
     parser.add_argument('--init_model', type=str, default=None)
+    parser.add_argument('--use_gpu', action='store_true')
     args = parser.parse_args()
 
     # Configure paths
@@ -178,7 +179,7 @@ def main():
         raise ValueError('Unknown optimizer! Please choose sgd or adam.')
 
     # Set device
-    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    device = torch.device("cuda:0" if torch.cuda.is_available() and args.use_gpu else "cpu")
 
     # Run training process over several epochs
     train_loss, test_loss = [], []

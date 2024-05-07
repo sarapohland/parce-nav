@@ -11,7 +11,7 @@
             <max_theta value="3.14"/>
         </randGoal>
         <global_waypoints enabled="True">
-            <waypoint_file value="/home/sara/competent-control/navigation/control/wypts/astro1.csv"/>
+            <waypoint_file value="/home/sara/parce/navigation/control/wypts/astro1.csv"/>
         </global_waypoints>
         <local_waypoints enabled="False">
             <waypoint_file value="None"/>
@@ -32,14 +32,14 @@
     </topics>
 
     <classifier>
-        <model value="/home/sara/competent-control/models/lunar-nav/classify/"/>
+        <model value="/home/sara/parce/models/lunar-nav/classify/"/>
     </classifier>
 
     <competency>
         <overall enabled="False"/>
         <regional enabled="True">
             <error_thresh value="0.8"/>
-            <decoder_dir value="/home/sara/competent-control/models/lunar-nav/inpaint/"/>
+            <decoder_dir value="/home/sara/parce/models/lunar-nav/inpaint/"/>
             <smooth method='avg' kernel="31" stride="1" pad="15"/>
             <mask height="0" base1="80" base2="160" pad="120"/>
             <turn_only enabled="False"/>
@@ -48,7 +48,7 @@
 
     <controller>
         <dynamics>
-            <file value="/home/sara/competent-control/dynamics/husky-20.p"/>
+            <file value="/home/sara/parce/dynamics/husky.p"/>
         </dynamics>
         <control>
             <u_low lin="0.0" ang="-0.4"/> 

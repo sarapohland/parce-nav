@@ -13,9 +13,23 @@ git clone https://github.com/sarapohland/parce.git
 
 ### 0b. Set up the navigation package
 
-In the main folder (`parce`), run the following command:
+It's recommended that you create an environment with Python 3.7:
+```
+conda create -n parce python=3.7
+```
+
+Then, in the main folder (`parce`), run the following command:
 ```
 pip install -e .
+```
+
+If you want to run the controller using ROS, you will need to also install ROS packages:
+```
+conda install conda-forge::ros-conda-base
+```
+
+```
+conda install conda-forge::ros-rospy
 ```
 
 ## 1) Set Up Lunar Simulation
@@ -40,7 +54,7 @@ To replicate the results presented in the paper, download the Lunar-Nav dataset 
 
 ### 2b. Collect training bags
 
-To collect bagfiles from the lunar sim, begin by launching the simulation:
+To collect bagfiles from the lunar sim, activate the lunar-sim environment, then launch the simulation:
 ```
 roslaunch lunar_gazebo lunar_test.launch world:=train_world
 ```
@@ -124,7 +138,7 @@ Use the existing cases in the setup_dataloader script to enable the use of your 
 
 ### 3a. Download the model files
 
-Download the models folder from [here](https://drive.google.com/drive/folders/1_oob1W8P_NH8YmVQNqvRDHeDdVz_FVWv?usp=share_link) and place it in the main directory (`parce`). This folder contains the default lunar classification model for navigation, along with the model architectures and training parameters used to train the model. If you want to modify the configurations to train new models, go through the remaining steps in this section. Otherwise, you can skip to step 4. 
+Download the models folder from [here](https://drive.google.com/drive/folders/1_oob1W8P_NH8YmVQNqvRDHeDdVz_FVWv?usp=share_link) and place it in the main directory (`parce`). This folder contains the default lunar classification model for navigation, along with the model architectures and training parameters used to train the model. If you want to modify the configurations to train new models, go through the remaining steps in this section. To evaluate the classification model, see substep 3e. Otherwise, you can skip to step 4. 
 
 ### 3b. Define the model architecture
 
@@ -142,7 +156,7 @@ You can train your model using the train script in the networks classification f
 python navigation/perception/networks/classification/train.py --train_data lunar-nav --output_dir models/lunar-nav/classify/ --train_config models/lunar-nav/classify/train.config --network_file models/lunar-nav/classify/layers.json
 ```
 
-The argument train_data is used to indicate which dataset should be used to train your classification model, which should be lunar-nav if you are using the default training dataset. The argument output_dir is used to define where your trained classification model will be saved. (This is `models/lunar-nav/classify` for the default model downloaded in 3a.) The arguments network_file and train_config are used to specify the location of your model architecture JSON file (created in 3b) and training parameter config file (created in 3c). 
+The argument train_data is used to indicate which dataset should be used to train your classification model, which should be lunar-nav if you are using the default training dataset. The argument output_dir is used to define where your trained classification model will be saved. (This is `models/lunar-nav/classify` for the default model downloaded in 3a.) The arguments network_file and train_config are used to specify the location of your model architecture JSON file (created in 3b) and training parameter config file (created in 3c). You can optionally use the use_gpu flag if you want to train your model using a GPU.
 
 ### 3e. Evaluate the classification model
 
@@ -152,13 +166,13 @@ You can evaluate your model using the test script in the networks classification
 python navigation/perception/networks/classification/test.py --test_data lunar-nav --model_dir models/lunar-nav/classify/
 ```
 
-The argument test_data is used to indicate which dataset should be used to evaluate your classification model, which should be lunar-nav if you are using the default evaluation dataset. The argument model_dir is used to specify where your trained classification model was saved. This should be the same location defined as the output_dir in step 3d. This script will save a confusion matrix to the model_dir directory.
+The argument test_data is used to indicate which dataset should be used to evaluate your classification model, which should be lunar-nav if you are using the default evaluation dataset. The argument model_dir is used to specify where your trained classification model was saved. This should be the same location defined as the output_dir in step 3d. You can optionally use the use_gpu flag if you want to evaluate your model using a GPU. This script will save a confusion matrix to the model_dir directory.
 
 ## 4) Design Overall Competency Estimator
 
-### 4a. Download the configuration files
+### 4a. Download the model files
 
-If you have not done so already, download the models folder from [here](https://drive.google.com/drive/folders/1_oob1W8P_NH8YmVQNqvRDHeDdVz_FVWv?usp=share_link) and place it in the main directory (`parce`). This folder contains the default lunar image reconstruction model, along with the model architectures and training parameters used to train the model. The trained overall competency estimator used in the paper is also contained in this folder. If you want to modify the configurations to train new models, go through the remaining steps in this section. Otherwise, you can skip to step 5. 
+If you have not done so already, download the models folder from [here](https://drive.google.com/drive/folders/1_oob1W8P_NH8YmVQNqvRDHeDdVz_FVWv?usp=share_link) and place it in the main directory (`parce`). This folder contains the default lunar image reconstruction model, along with the model architectures and training parameters used to train the model. The trained overall competency estimator used in the paper is also contained in this folder. If you want to modify the configurations to train new models, go through the remaining steps in this section. To evaluate the reconstruction model, see substep 4e. To evaluate the overall competency estimator, see 4g. To visualize examples of overall model competency estimates, see substep 4h. Otherwise, you can skip to step 5. 
 
 ### 4b. Define the model architecture
 
@@ -176,7 +190,7 @@ To train the image reconstruction model, you can use the train script in the net
 python navigation/perception/networks/reconstruction/train.py reconstruct --architecture autoencoder --train_data lunar-nav --model_dir models/lunar-nav/classify/ --output_dir models/lunar-nav/reconstruct/ --train_config models/lunar-nav/reconstruct/train.config --network_file models/lunar-nav/reconstruct/layers.json
 ```
 
-The argument train_data is used to indicate which dataset should be used to train your classification model, which should be lunar-nav if you are using the default training dataset. The argument model_dir is used to specify where your trained classification model was saved. This should be the same location defined as the output_dir in step 3d. The argument output_dir is used to define where your trained reconstruction model will be saved. (This is `models/lunar-nav/reconstruct` for the default model.) The arguments network_file and train_config are used to specify the location of your model architecture JSON file (created in 4b) and training parameter config file (created in 4c). 
+The argument train_data is used to indicate which dataset should be used to train your classification model, which should be lunar-nav if you are using the default training dataset. The argument model_dir is used to specify where your trained classification model was saved. This should be the same location defined as the output_dir in step 3d. The argument output_dir is used to define where your trained reconstruction model will be saved. (This is `models/lunar-nav/reconstruct` for the default model.) The arguments network_file and train_config are used to specify the location of your model architecture JSON file (created in 4b) and training parameter config file (created in 4c). You can optionally use the use_gpu flag if you want to train your model using a GPU.
 
 ### 4e. Evaluate the reconstruction model
 
@@ -186,7 +200,7 @@ To evaluate the image reconstruction model, you can use the test script in the n
 python navigation/perception/networks/reconstruction/test.py reconstruct --architecture autoencoder --test_data lunar-nav --model_dir models/lunar-nav/classify/ --decoder_dir models/lunar-nav/reconstruct/
 ```
 
-The argument test_data is used to indicate which dataset should be used to evaluate your reconstruction model, which should be lunar-nav if you are using the default evaluation dataset. The argument model_dir is used to specify where your trained classification model was saved, and decoder_dir is used to specify where your trained reconstruction model was saved. This script will save several figures (displaying the original and reconstructed images) to a folder called reconstruction in decoder_dir.
+The argument test_data is used to indicate which dataset should be used to evaluate your reconstruction model, which should be lunar-nav if you are using the default evaluation dataset. The argument model_dir is used to specify where your trained classification model was saved, and decoder_dir is used to specify where your trained reconstruction model was saved. You can optionally use the use_gpu flag if you want to evaluate your model using a GPU. This script will save several figures (displaying the original and reconstructed images, along with the reconstruction loss) to a folder called `reconstruction` in decoder_dir.
 
 ### 4f. Train the overall competency estimator
 
@@ -196,7 +210,7 @@ You can train a competency estimator for your model using the train script in th
 python navigation/perception/competency/train.py overall --train_data lunar-nav --model_dir models/lunar-nav/classify/ --decoder_dir models/lunar-nav/reconstruct/
 ```
 
-The argument train_data is used to indicate which dataset should be used to train the overall competency estimator, which should be lunar-nav if you are using the default training dataset. The argument model_dir is used to specify where your trained classification model was saved, and decoder_dir is used to specify where your trained reconstruction model was saved.
+The argument train_data is used to indicate which dataset should be used to train the overall competency estimator, which should be lunar-nav if you are using the default training dataset. The argument model_dir is used to specify where your trained classification model was saved, and decoder_dir is used to specify where your trained reconstruction model was saved. You can optionally use the use_gpu flag if you want to train your model using a GPU.
 
 ### 4g. Evaluate the overall competency estimator
 
@@ -206,7 +220,7 @@ You can evaluate your competency estimator using the test script in the competen
 python navigation/perception/competency/test.py overall --test_data lunar-nav --model_dir models/lunar-nav/classify/ --decoder_dir models/lunar-nav/reconstruct/
 ```
 
-The argument test_data is used to indicate which dataset should be used to evaluate the overall competency estimator, which should be lunar-nav if you are using the default evaluation dataset. The argument model_dir is used to specify where your trained classification model was saved, and decoder_dir is used to specify where your trained reconstruction model was saved. This script will generate plots of the reconstruction loss distributions and probabilistic competency estimates for the correctly classified and misclassified in-distribution data, as well as the out-of-distribution data, and save them to the decoder_dir directory.
+The argument test_data is used to indicate which dataset should be used to evaluate the overall competency estimator, which should be lunar-nav if you are using the default evaluation dataset. The argument model_dir is used to specify where your trained classification model was saved, and decoder_dir is used to specify where your trained reconstruction model was saved. You can optionally use the use_gpu flag if you want to evaluate your model using a GPU. This script will generate plots of the reconstruction loss distributions and probabilistic competency estimates for the correctly classified and misclassified in-distribution data, as well as the out-of-distribution data, and save them to the decoder_dir directory.
 
 ### 4h. Visualize the overall competency estimates
 
@@ -216,13 +230,13 @@ You can visualize the overall competency estimates for each test image using the
 python navigation/perception/competency/visualize.py overall --test_data lunar-nav --model_dir models/lunar-nav/classify/ --decoder_dir models/lunar-nav/reconstruct/
 ```
 
-The argument test_data is used to indicate which dataset should be used for visualization, which should be lunar-nav if you are using the default evaluation dataset. The argument model_dir is used to specify where your trained classification model was saved, and decoder_dir is used to specify where your trained reconstruction model was saved. This script will save figures of the input image and competency estimate to subfolders (correct, incorrect, and ood) in a folder called competency in decoder_dir.
+The argument test_data is used to indicate which dataset should be used for visualization, which should be lunar-nav if you are using the default evaluation dataset. The argument model_dir is used to specify where your trained classification model was saved, and decoder_dir is used to specify where your trained reconstruction model was saved. You can optionally use the use_gpu flag if you want to visualize the model estimates using a GPU. This script will save figures of the input image and competency score to subfolders (correct, incorrect, and ood) in a folder called `competency` in decoder_dir.
 
 ## 5) Design Regional Competency Estimator
 
-### 5a. Download the configuration files
+### 5a. Download the model files
 
-If you have not done so already, download the models folder from [here](https://drive.google.com/drive/folders/1_oob1W8P_NH8YmVQNqvRDHeDdVz_FVWv?usp=share_link) and place it in the main directory (`parce`). This folder contains the default lunar image inpainting model, along with the model architectures and training parameters used to train the model. The trained regional competency estimator used in the paper is also contained in this folder, along with labels for the segmented OOD dataset provided. If you want to modify the configurations to train new models, go through the remaining steps in this section. Otherwise, you can skip to step 6. 
+If you have not done so already, download the models folder from [here](https://drive.google.com/drive/folders/1_oob1W8P_NH8YmVQNqvRDHeDdVz_FVWv?usp=share_link) and place it in the main directory (`parce`). This folder contains the default lunar image inpainting model, along with the model architectures and training parameters used to train the model. The trained regional competency estimator used in the paper is also contained in this folder, along with labels for the segmented OOD dataset provided. If you want to modify the configurations to train new models, go through the remaining steps in this section. To evaluate the image inpainting model, see substep 5e. To evaluate the regional competency estimator, see 5h. To visualize examples of the regional competency maps, see substep 5i. Otherwise, you can skip to step 6. 
 
 ### 5b. Define the model architecture
 
@@ -240,7 +254,7 @@ To train the image inpainting model, you can use the train script in the network
 python navigation/perception/networks/reconstruction/train.py inpaint --architecture autoencoder --train_data lunar-nav --model_dir models/lunar-nav/classify/ --output_dir models/lunar-nav/inpaint/ --train_config models/lunar-nav/inpaint/train.config --network_file models/lunar-nav/inpaint/encoder.json --init_model models/lunar-nav/reconstruct/
 ```
 
-The argument train_data is used to indicate which dataset should be used to train your classification model, which should be lunar-nav if you are using the default training dataset. The argument model_dir is used to specify where your trained classification model was saved. This should be the same location defined as the output_dir in step 3d. The argument output_dir is used to define where your trained image inpainting model will be saved. (This is `models/lunar-nav/inpaint` for the default model.) The arguments network_file and train_config are used to specify the location of your model architecture JSON file (created in 5b) and training parameter config file (created in 5c).
+The argument train_data is used to indicate which dataset should be used to train your classification model, which should be lunar-nav if you are using the default training dataset. The argument model_dir is used to specify where your trained classification model was saved. This should be the same location defined as the output_dir in step 3d. The argument output_dir is used to define where your trained image inpainting model will be saved. (This is `models/lunar-nav/inpaint` for the default model.) The arguments network_file and train_config are used to specify the location of your model architecture JSON file (created in 5b) and training parameter config file (created in 5c). You can optionally use the use_gpu flag if you want to train your model using a GPU.
 
 ### 5e. Evaluate the inpainting model
 
@@ -250,7 +264,7 @@ To evaluate the image inpainting model, you can use the test script in the netwo
 python navigation/perception/networks/reconstruction/test.py inpaint --architecture autoencoder --test_data lunar-nav --model_dir models/lunar-nav/classify/ --decoder_dir models/lunar-nav/inpaint/
 ```
 
-The argument test_data is used to indicate which dataset should be used to evaluate your image inpainting model, which should be lunar-nav if you are using the default evaluation dataset. The argument model_dir is used to specify where your trained classification model was saved, and decoder_dir is used to specify where your trained inpainting model was saved. This script will save several figures (displaying the original, masked, and reconstructed images) to a folder called reconstruction in decoder_dir.
+The argument test_data is used to indicate which dataset should be used to evaluate your image inpainting model, which should be lunar-nav if you are using the default evaluation dataset. The argument model_dir is used to specify where your trained classification model was saved, and decoder_dir is used to specify where your trained inpainting model was saved. You can optionally use the use_gpu flag if you want to evaluate your model using a GPU. This script will save several figures (displaying the original, masked, and reconstructed images, along with the reconstruction loss) to a folder called reconstruction in decoder_dir.
 
 ### 5f. Train the regional competency estimator
 
@@ -260,7 +274,7 @@ You can train a competency estimator for your model using the train script in th
 python navigation/perception/competency/train.py regional --train_data lunar-nav --model_dir models/lunar-nav/classify/ --decoder_dir models/lunar-nav/inpaint/
 ```
 
-The argument train_data is used to indicate which dataset should be used to train the regional competency estimator, which should be lunar-nav if you are using the default training dataset. The argument model_dir is used to specify where your trained classification model was saved, and decoder_dir is used to specify where your trained image inpainting model was saved.
+The argument train_data is used to indicate which dataset should be used to train the regional competency estimator, which should be lunar-nav if you are using the default training dataset. The argument model_dir is used to specify where your trained classification model was saved, and decoder_dir is used to specify where your trained image inpainting model was saved. You can optionally use the use_gpu flag if you want to train your model using a GPU.
 
 ### 5g. Generate true labels of familiar/unfamiliar regions in image
 
@@ -280,7 +294,7 @@ You can evaluate your competency estimator using the test script in the competen
 python navigation/perception/competency/test.py regional --test_data lunar-nav --model_dir models/lunar-nav/classify/ --decoder_dir models/lunar-nav/inpaint/
 ```
 
-The argument test_data is used to indicate which dataset should be used to evaluate the regional competency estimator, which should be lunar-nav if you are using the default evaluation dataset. The argument model_dir is used to specify where your trained classification model was saved, and decoder_dir is used to specify where your trained image inpainting model was saved. This script will generate plots of the reconstruction loss distributions and probabilistic competency estimates for both the familiar and unfamiliar regions in the out-of-distribution images (as determined in the previous step), as well as all of the regions in the in-distribution images, and save them to the decoder_dir directory.
+The argument test_data is used to indicate which dataset should be used to evaluate the regional competency estimator, which should be lunar-nav if you are using the default evaluation dataset. The argument model_dir is used to specify where your trained classification model was saved, and decoder_dir is used to specify where your trained image inpainting model was saved. You can optionally use the use_gpu flag if you want to evaluate your model using a GPU. This script will generate plots of the reconstruction loss distributions and probabilistic competency estimates for both the familiar and unfamiliar regions in the out-of-distribution images (as determined in the previous step), as well as all of the regions in the in-distribution images, and save them to the decoder_dir directory.
 
 ### 5i. Visualize the regional competency estimates
 
@@ -290,17 +304,21 @@ You can visualize the regional competency maps for each test image using the vis
 python navigation/perception/competency/visualize.py regional --test_data lunar-nav --model_dir models/lunar-nav/classify/ --decoder_dir models/lunar-nav/inpaint/
 ```
 
-The argument test_data is used to indicate which dataset should be used for visualization, which should be lunar-nav if you are using the default evaluation dataset. The argument model_dir is used to specify where your trained classification model was saved, and decoder_dir is used to specify where your trained image inpainting model was saved. This script will save figures of the input image, true labeled image (with the labels from 5g), and the regional competency model predictions to subfolders (id and ood) in a folder called competency in decoder_dir.
+The argument test_data is used to indicate which dataset should be used for visualization, which should be lunar-nav if you are using the default evaluation dataset. The argument model_dir is used to specify where your trained classification model was saved, and decoder_dir is used to specify where your trained image inpainting model was saved. You can optionally use the use_gpu flag if you want to visualize the competency maps using a GPU. This script will save figures of the input image, true labeled image (with the labels from 5g), and the regional competency model predictions to subfolders (id and ood) in a folder called competency in decoder_dir.
 
 ## 6) Estimate Vehicle Dynamics Model
 
-### 6a. Define the controller parameters
+### 6a. Download the model file
+
+To replicate the results presented in the paper, download the husky file from the `dynamics` folder available [here](https://drive.google.com/drive/folders/1_oob1W8P_NH8YmVQNqvRDHeDdVz_FVWv?usp=share_link). Create a folder called `dynamics` in the  main directory (`parce`) and place the dataset file you downloaded into this folder. If you simply want to use the default Husky dynamics model, you can skip to step 7. If you want to train a new dynamics model, proceed through the rest of the substeps in this section.
+
+### 6b. Define the controller parameters
 
 To estimate a model of the vehicle dynamics, you will need to collect data of the vehicle running under a random walk controller. Before doing so, you must specify the parameters for the random walk controller in a configuration file like the examples given in `navigation/control/configs/`.
 
 For now, you only need to specify use_sim, vehicle, and time_limit under the environment section. The parameter use_sim indicates whether trials are being run in simulation or on a physical platform, vehicle specifies which vehicle model should be used (e.g., husky, spot, warty), and time_limit indicates the amount of time allocated for vehicle data collection. You also need to specify the vehicle odometry topic (odom_topic) and velocity command topic (cmd_topic) under the topics section. Finally, under the controller section, you must specify cmd_rate, u_low, and u_high. The parameters u_low and u_high are the minimum and maximum velocities (lin is linear velocity and ang is turn rate) of an action, and the cmd_rate is the rate at which the control runs (in Hz).
 
-### 6b. Collect data under random walk controller
+### 6c. Collect data under random walk controller
 
 To collect data of the vehicle dynamics in the lunar simulation, first bring up the lunar simulation:
 
@@ -315,7 +333,7 @@ python navigation/control/dynamics/collect_data.py <xml_file>
 
 The xml_file should be the same one chosen/created in the previous step. This will save bag files of the velocity commands and vehicle odometry to your working directory. Note that you should collect multiple bag files for training and evaluating your dyanmics model.
 
-### 6c. Train vehicle dynamics model
+### 6d. Train vehicle dynamics model
 
 To train a model of the vehicle dynamics from the data you collected in the previous step, you can use the train script in the dynamics folder:
 ```
@@ -324,7 +342,7 @@ python navigation/control/dynamics/train.py <xml_file> --model_file dynamics/hus
 
 The xml_file should be the same one chosen/created in the step 6a. The argument model_file indicates where the model of the vehicle dynamics will be saved, and bag_files indicates the folder where the training bag files were saved in step 6b. You can optionally use the horizon argument to indicate how many steps ahead you would like to predict the state of the vehicle when determining the parameters of the non-linear dynamics model.
 
-### 6d. Evaluate vehicle dynamics model
+### 6e. Evaluate vehicle dynamics model
 
 To evaluate your model of the vehicle dynamics, you can use the test script in the dynamics folder:
 ```
@@ -337,7 +355,7 @@ The model_file should be the same file used for training in step 6c. The argumen
 
 ### 7a. Define the planning parameters
 
-To design the competency-aware path planning algorithm, you must specify the parameters for the planner in a configuration file like the examples given in `navigation/control/configs/`. If you simply want to run with the default planning parameters used for evaluation, you can skip this step and use the config files provided in this folder. More details on the configurations are provided in the configs [README](https://github.com/sarapohland/parce/tree/main/navigation/control/configs/README.md). Note that you do not need to define all these parameters to evaluate the planning algorithm, but many are relevant.
+To design the competency-aware path planning algorithm, you must specify the parameters for the planner in a configuration file like the examples given in `navigation/control/configs/`. If you simply want to run with the default planning parameters used for evaluation, you can use the config files provided in this folder, but you will need to change the file locations to match your (absolute) file paths. More details on the configurations are provided in the configs [README](https://github.com/sarapohland/parce/tree/main/navigation/control/configs/README.md). Note that you do not need to define all these parameters to evaluate the planning algorithm, but many are relevant.
 
 ### 7b. Evaluate the path planner
 
@@ -347,17 +365,19 @@ You can visualize the evaluation of sampled paths on test data using the test sc
 python navigation/control/planning/test.py <xml_file> --test_data lunar-nav
 ```
 
-As usual, test_data is used to indicate which dataset should be used for visualization. The xml_file should be the configuration file chosen or created in the previous step. This command will save examples of the regional competency estimates, the score associated with sampled trajectories, the sampled trajectories below the specified threshold, and the selected trajectory for each image in the ID and OOD test sets to a folder called `results/planning/`. Alternatively, you can use the example argument to indicate a single example in the OOD test set to be used for evaluation. Doing so will save the single example image to a folder called `results/examples/`. Optionally, you can also specify the initial position of the vehicle using the init_x and init_y arguments and the goal position using the goal_x and goal_y arguments.
+As usual, test_data is used to indicate which dataset should be used for visualization. The xml_file should be the configuration file chosen or created in the previous step. This command will save examples of the regional competency estimates, the score associated with sampled trajectories, the sampled trajectories below the specified threshold, and the selected trajectory for each image in the ID and OOD test sets to a folder called `results/planning/`. 
+
+Alternatively, you can use the example argument to indicate a single example in the OOD test set to be used for evaluation. Doing so will save the single example image to a folder called `results/examples/`. Optionally, you can also specify the initial position of the vehicle using the init_x and init_y arguments and the goal position using the goal_x and goal_y arguments.
 
 ## 8) Design Path-Tracking Controller
 
 ### 8a. Define the controller parameters
 
-To design the path-tracking control algorithm, you must specify the parameters for the controller in a configuration file like the examples given in `navigation/control/configs/`. If you simply want to run with the default tracking parameters used for evaluation, you can skip this step and use the config files provided in this folder. More details on the configurations are provided in the configs [README](https://github.com/sarapohland/parce/tree/main/navigation/control/configs/README.md). Note that you do not need to define all these parameters to evaluate the tracking algorithm, but many are relevant.
+To design the path-tracking control algorithm, you must specify the parameters for the controller in a configuration file like the examples given in `navigation/control/configs/`. If you simply want to run with the default tracking parameters used for evaluation, you can use the config files provided in this folder, but you will need to change the file locations to match your (absolute) file paths. More details on the configurations are provided in the configs [README](https://github.com/sarapohland/parce/tree/main/navigation/control/configs/README.md). Note that you do not need to define all these parameters to evaluate the tracking algorithm, but many are relevant.
 
 ### 8b. Evaluate the tracking controller
 
-To evaluate the performance of the path-tracking controller, first bring up the lunar simulation:
+To evaluate the performance of the path-tracking controller, first bring up the lunar simulation within the lunar-sim environment:
 
 ```
 roslaunch lunar_gazebo lunar_test.launch world:=train_world
@@ -366,20 +386,20 @@ roslaunch lunar_gazebo lunar_test.launch world:=train_world
 You can visualize the selected and realized paths of the vehicle using the test script in the tracking folder:
 
 ```
-python navigation/control/tracking/test.py <xml_file> --goal_x 10 -- goal_y 5
+python navigation/control/tracking/test.py <xml_file> --goal_x 10 --goal_y 5
 ```
 
-The xml_file should be the configuration file chosen or created in the previous step. This command will save examples of the optimal path selected by the path planner and the realized path executed using the path-tracking conroller. Optionally, you can specify the goal position using the goal_x and goal_y arguments.
+The xml_file should be the configuration file chosen or created in the previous step. This command will save examples of the optimal path selected by the path planner and the realized path executed using the path-tracking conroller, along with the error in vehicle position. Optionally, you can specify the goal position using the goal_x and goal_y arguments.
 
 ## 9) Run Competency-Aware Controller
 
 ### 9a. Define the controller parameters
 
-You can specify the parameters for the competency-aware controller in a configuration file like the examples given in `navigation/control/configs/`. If you simply want to run with the default controller parameters used for evaluation, you can skip this step and use the config files provided in this folder. More details on the configurations are provided in the configs [README](https://github.com/sarapohland/parce/tree/main/navigation/control/configs/README.md).
+You can specify the parameters for the competency-aware controller in a configuration file like the examples given in `navigation/control/configs/`. If you simply want to run with the default controller parameters used for evaluation, you can use the config files provided in this folder, but you will need to change the file locations to match your (absolute) file paths. More details on the configurations are provided in the configs [README](https://github.com/sarapohland/parce/tree/main/navigation/control/configs/README.md).
 
 ### 9b. Run controller in lunar simulation
 
-To test the controller with the specified parameters in the lunar simulation, first bring up the lunar simulation:
+To test the controller with the specified parameters in the lunar simulation, first bring up the lunar simulation in the lunar-sim environment:
 
 ```
 roslaunch lunar_gazebo lunar_test.launch world:=test_world
@@ -426,7 +446,7 @@ To analyze the results you just collected, you can use the analyze script in the
 python navigation/control/controller/analyze.py <data_dir>
 ```
 
-The data directory (data_dir) should be the folder where the CSV file(s) you collected in the previous step are stored. By default, this is `results/navigation/`. This command will print a table with the total number of success, timeouts, and collisions across all trials for each controller type, as well as the average navigation time, path length, linear velocity, angular velocity, linear acceleration, and angular acceleration across all of the trials.
+The data directory (data_dir) should be the folder where the CSV file(s) you collected in the previous step are stored. By default, this is `results/navigation/`. This command will print a table with the total number of success, timeouts, and collisions across all trials for each controller type, as well as the average navigation time, path length, linear velocity, angular velocity, linear acceleration, and angular acceleration across all of the trials. You can optionally use the scenario flag to print a table of results for each scenario indepentlty, in addition to the results pulled across all scenarios.
 
 ### 9d. Create videos of controllers with varying levels of competency awareness
 

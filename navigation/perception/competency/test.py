@@ -55,6 +55,7 @@ def main():
     parser.add_argument('--test_data', type=str, default='lunar-nav')
     parser.add_argument('--model_dir', type=str, default='model/classify/')
     parser.add_argument('--decoder_dir', type=str, default='model/reconstruct/')
+    parser.add_argument('--use_gpu', action='store_true')
     args = parser.parse_args()
 
     # Load trained perception model
@@ -67,7 +68,8 @@ def main():
     # Load trained competency estimator
     file = os.path.join(args.decoder_dir, 'parce.p')
     estimator = pickle.load(open(file, 'rb'))
-    estimator.set_device("cpu")
+    device = torch.device("cuda:0" if torch.cuda.is_available() and args.use_gpu else "cpu")
+    estimator.set_device(device)
     config_file = os.path.join(args.decoder_dir, 'train.config')
     train_config = configparser.RawConfigParser()
     train_config.read(config_file)

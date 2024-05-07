@@ -1,6 +1,5 @@
 import os
 import pickle
-import control
 import numpy as np
 import xml.etree.ElementTree as ET
 

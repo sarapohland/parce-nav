@@ -292,9 +292,11 @@ class PARCE:
         if self.smoothing == 'min':
             pooling = torch.nn.MaxPool2d(self.kernel, self.stride, self.padding)
             smooth_scores = -pooling(-score_tensor)[0,:,:]
-        else:
+        elif self.smoothing == 'avg':
             pooling = torch.nn.AvgPool2d(self.kernel, self.stride, self.padding, count_include_pad=False)
             smooth_scores = pooling(score_tensor)[0,:,:]
+        else:
+            smooth_scores = score_tensor[0,:,:]
         
         return smooth_scores
     

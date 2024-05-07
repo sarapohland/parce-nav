@@ -186,7 +186,10 @@ class Controller:
                 self.vel_msg.angular.z = 0
                 self.vel_pub.publish(self.vel_msg)
                 self.realized_paths.append(self.realized_path)
-                self.record_results()
+                
+                # End trial
+                rospy.signal_shutdown("Finished trial!")
+                sys.exit()
 
         self.got_odom = True
 
@@ -270,64 +273,6 @@ class Controller:
             rate.sleep()
 
 
-    #####################################
-    ## Functions for recording results ##
-    #####################################
-
-    def record_results(self):
-        # Create folder to save results
-        output_dir = 'results/tracking/'
-        if not os.path.exists(output_dir):
-            os.makedirs(output_dir)
-
-        # Plot sampled paths and realized paths
-        for idx, (img, init_state, desired, realized) in enumerate(zip(self.images, self.init_states, self.selected_paths, self.realized_paths)):
-
-            # Compute error in position
-            desired = desired[:len(realized)]
-            error = realized - desired
-            pos_error = np.linalg.norm(error[:,:2], axis=1)
-
-            # Display image
-            fig, axs = plt.subplots(1, 2, figsize=(10, 4))
-            plt.subplot(1, 2, 1)
-            img = np.squeeze(img.numpy() * 255).astype(np.uint8)
-            img = np.swapaxes(np.swapaxes(img, 0, 1), 1, 2)
-            plt.imshow(img)
-
-            # Display selected trajectory
-            new_desired = world_to_robot(np.array(desired), init_state[:3])
-            new_desired = self.planning.get_traj_pixels(new_desired)
-            xs = [pos[0] for pos in new_desired]
-            ys = [pos[1] for pos in new_desired]
-            plt.scatter(xs, ys, c='g', marker='.', s=10, label='Desired')
-
-            # Display realizd trajectory
-            new_realized = world_to_robot(np.array(realized), init_state[:3])
-            new_realized = self.planning.get_traj_pixels(new_realized)
-            xs = [pos[0] for pos in new_realized]
-            ys = [pos[1] for pos in new_realized]
-            plt.scatter(xs, ys, c='b', marker='.', s=10, label='Realized')
-
-            plt.legend()
-            plt.title('Panned Path and Realized Trajectory')
-
-            # Display position error over time
-            plt.subplot(1, 2, 2)
-            plt.scatter(range(len(pos_error)), pos_error, c='r', marker='.', s=5)
-            plt.title('Error in Vehicle Position')
-            plt.xlabel('Time Step')
-            plt.ylabel('Position Error (m)')
-
-            plt.suptitle('Performance of Path-Tracking Controller')
-            plt.savefig(os.path.join(output_dir, '({},{})_{}.png'.format(round(self.xG[0]), round(self.xG[1]), idx)))
-            plt.close()
-
-        # End trial
-        rospy.signal_shutdown("Finished trial!")
-        sys.exit()
-
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser('Parse configuration file')
     parser.add_argument('config_file', type=str)
@@ -337,4 +282,51 @@ if __name__ == "__main__":
 
     rospy.init_node('controller', anonymous=True, disable_signals=True)
     interface = Controller(args.config_file, args.goal_x, args.goal_y)
-    rospy.spin()
+
+    # Create folder to save results
+    output_dir = 'results/tracking/'
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+
+    # Plot sampled paths and realized paths
+    for idx, (img, init_state, desired, realized) in enumerate(zip(interface.images, interface.init_states, interface.selected_paths, interface.realized_paths)):
+
+        # Compute error in position
+        desired = desired[:len(realized)]
+        error = realized - desired
+        pos_error = np.linalg.norm(error[:,:2], axis=1)
+
+        # Display image
+        fig, axs = plt.subplots(1, 2, figsize=(10, 4))
+        plt.subplot(1, 2, 1)
+        img = np.squeeze(img.numpy() * 255).astype(np.uint8)
+        img = np.swapaxes(np.swapaxes(img, 0, 1), 1, 2)
+        plt.imshow(img)
+
+        # Display selected trajectory
+        new_desired = world_to_robot(np.array(desired), init_state[:3])
+        new_desired = interface.planning.get_traj_pixels(new_desired)
+        xs = [pos[0] for pos in new_desired]
+        ys = [pos[1] for pos in new_desired]
+        plt.scatter(xs, ys, c='g', marker='.', s=10, label='Desired')
+
+        # Display realizd trajectory
+        new_realized = world_to_robot(np.array(realized), init_state[:3])
+        new_realized = interface.planning.get_traj_pixels(new_realized)
+        xs = [pos[0] for pos in new_realized]
+        ys = [pos[1] for pos in new_realized]
+        plt.scatter(xs, ys, c='b', marker='.', s=10, label='Realized')
+
+        plt.legend()
+        plt.title('Panned Path and Realized Trajectory')
+
+        # Display position error over time
+        plt.subplot(1, 2, 2)
+        plt.scatter(range(len(pos_error)), pos_error, c='r', marker='.', s=5)
+        plt.title('Error in Vehicle Position')
+        plt.xlabel('Time Step')
+        plt.ylabel('Position Error (m)')
+
+        plt.suptitle('Performance of Path-Tracking Controller')
+        plt.savefig(os.path.join(output_dir, '({},{})_{}.png'.format(round(interface.xG[0]), round(interface.xG[1]), idx)))
+        plt.close()

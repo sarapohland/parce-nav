@@ -19,6 +19,7 @@ models/
 results/
 bags/
 *.bag
+*.p
 
 # jupyter checkpoints
 .ipynb_checkpoints

@@ -15,6 +15,7 @@ def main():
     parser.add_argument('--train_data', type=str, default='lunar-nav')
     parser.add_argument('--model_dir', type=str, default='model/classify/')
     parser.add_argument('--decoder_dir', type=str, default='model/reconstruct/')
+    parser.add_argument('--use_gpu', action='store_true')
     args = parser.parse_args()
 
     # Fit competency estimator from training data
