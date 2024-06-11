@@ -66,7 +66,7 @@ class PARCE:
             self.padding = train_config.getint('smoothing', 'padding')
             self.smoothing = train_config.getint('smoothing', 'method')
         except:
-            pass
+            self.smoothing = None
 
         # Get reconstruction loss for all test images
         all_losses, all_labels = self._get_losses(test_loader)
@@ -219,11 +219,8 @@ class PARCE:
             # Compute reconstruction loss
             losses = []
             for seg_true, seg_pred, segment in zip(true, pred, segments):
-                if np.shape(segment)[1] < self.min_reco:
-                    avg_loss = torch.tensor(float('nan'))
-                else:
-                    loss_img = loss_func(seg_true, seg_pred)
-                    avg_loss = torch.mean(loss_img[:, segment[0, :], segment[1, :]])
+                loss_img = loss_func(seg_true, seg_pred)
+                avg_loss = torch.mean(loss_img[:, segment[0, :], segment[1, :]])
                 losses.append(avg_loss.cpu())
             losses = torch.vstack(losses).detach().numpy()
             outputs = np.vstack(outputs)
@@ -232,9 +229,27 @@ class PARCE:
 
         else:
             raise NotImplementedError('Unknown competency estimation method.')
-        
+
     # Estimate probabilistic perception model competency
     def comp_scores(self, inputs, outputs):
+        # Compute reconstruction loss
+        losses, class_probs, _ = self.comp_losses(inputs, outputs)
+
+        # Estimate probability that image is ID
+        loss_probs = np.zeros((len(losses), self.C))
+        for c in range(self.C):
+            zvals = (losses - (2 * self.class_means[c])) / self.class_stds[c] - self.zscore
+            loss_probs[:, c] = 1 - stats.norm.cdf(zvals).flatten()
+        
+        # Estimate probability that model is competent
+        scores = np.sum(loss_probs * class_probs, axis=1)
+        if self.method == 'overall':
+            scores *= np.max(class_probs, axis=1)
+
+        return scores
+    
+    # Estimate probabilistic perception model competency
+    def comp_scores_and_losses(self, inputs, outputs):
         # Compute reconstruction loss
         losses, class_probs, _ = self.comp_losses(inputs, outputs)
 

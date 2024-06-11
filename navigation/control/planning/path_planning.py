@@ -300,13 +300,13 @@ class PathPlanner():
         # Compute competency estimates
         # a) full competency awareness
         if self.overall_comp and self.regional_comp:
-            competency, _ = self.overall_comp.comp_scores(image, output)
+            competency = self.overall_comp.comp_scores(image, output)
             regional = self.regional_comp.map_scores(image, output)
             comp_map = torch.ones((h, w)) if competency > self.ovl_thresh else regional.clone()
        
         # b) overall-only awareness
         elif self.overall_comp and not self.regional_comp:
-            competency, _ = self.overall_comp.comp_scores(image, output)
+            competency = self.overall_comp.comp_scores(image, output)
             regional = torch.ones((h, w))
             comp_map = torch.ones((h, w)) if competency > self.ovl_thresh else torch.zeros((h, w))
        

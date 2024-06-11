@@ -172,7 +172,7 @@ The argument test_data is used to indicate which dataset should be used to evalu
 
 ### 4a. Download the model files
 
-If you have not done so already, download the models folder from [here](https://drive.google.com/drive/folders/1_oob1W8P_NH8YmVQNqvRDHeDdVz_FVWv?usp=share_link) and place it in the main directory (`parce`). This folder contains the default lunar image reconstruction model, along with the model architectures and training parameters used to train the model. The trained overall competency estimator used in the paper is also contained in this folder. If you want to modify the configurations to train new models, go through the remaining steps in this section. To evaluate the reconstruction model, see substep 4e. To evaluate the overall competency estimator, see 4g. To visualize examples of overall model competency estimates, see substep 4h. Otherwise, you can skip to step 5. 
+If you have not done so already, download the models folder from [here](https://drive.google.com/drive/folders/1_oob1W8P_NH8YmVQNqvRDHeDdVz_FVWv?usp=share_link) and place it in the main directory (`parce`). This folder contains the default lunar image reconstruction model, along with the model architectures and training parameters used to train the model. The trained overall competency estimator used in the paper is also contained in this folder. If you want to modify the configurations to train new models, go through the remaining steps in this section. To evaluate the reconstruction model, see substep 4e. To evaluate the overall competency estimator, see 4g. To visualize examples of overall model competency estimates, see substep 4h. Finally, to compare our method to existing methods for competency estimation, see substep 4i. Otherwise, you can skip to step 5. 
 
 ### 4b. Define the model architecture
 
@@ -232,11 +232,29 @@ python navigation/perception/competency/visualize.py overall --test_data lunar-n
 
 The argument test_data is used to indicate which dataset should be used for visualization, which should be lunar-nav if you are using the default evaluation dataset. The argument model_dir is used to specify where your trained classification model was saved, and decoder_dir is used to specify where your trained reconstruction model was saved. You can optionally use the use_gpu flag if you want to visualize the model estimates using a GPU. This script will save figures of the input image and competency score to subfolders (correct, incorrect, and ood) in a folder called `competency` in decoder_dir.
 
+### 4i. Competency overall competency scores to existing methods
+
+We compare our overall competency scores to a number of uncertainty quantification and OOD detection methods, which are implemented in `navigation/perception/comparison/overall/methods.py`. We collect results for each method individually using the evaluate script in that folder:
+
+```
+python navigation/perception/comparison/overall/evaluate.py parce --save_file results/overall/parce.csv
+```
+
+In the command above, you can replace `parce` with each of the available methods (softmax, temperature, entropy, energy, dropout, ensemble, odin, kl, openmax, mahalanobis, knn, or dice) and select the CSV file where you would like to save the results for the partcicular method. You can optionally use the use_gpu flag to run evaluations on your GPU. To change the dataset, classification model, and reconstruction model from their defaults, use the test_data, model_dir, and decoder_dir arguments. Note that when evaluating the ensemble method, you will need to specify the model_dir that contains all of the model path files for the ensemble. (The ensemble we use is provided in the models folder [here](https://drive.google.com/drive/folders/1_oob1W8P_NH8YmVQNqvRDHeDdVz_FVWv?usp=share_link).) This command will save a CSV file of results to the file indicated by the save_file argument.
+
+After running evaluations for each of the methods, you can compare them using the compare script in the same folder:
+
+```
+python navigation/perception/comparison/overall/compare.py results/overall/
+```
+
+You should replace `results/overall/` with the folder where all of the evaluation files are stored. This command will pull all of the CSV files from the given folder, read the results, calculate a number of performance metrics for each method, and print a table comparing the metrics to the terminal. It will also save figures of the score distributions for each method to the provided folder, along with ROC curves.
+
 ## 5) Design Regional Competency Estimator
 
 ### 5a. Download the model files
 
-If you have not done so already, download the models folder from [here](https://drive.google.com/drive/folders/1_oob1W8P_NH8YmVQNqvRDHeDdVz_FVWv?usp=share_link) and place it in the main directory (`parce`). This folder contains the default lunar image inpainting model, along with the model architectures and training parameters used to train the model. The trained regional competency estimator used in the paper is also contained in this folder, along with labels for the segmented OOD dataset provided. If you want to modify the configurations to train new models, go through the remaining steps in this section. To evaluate the image inpainting model, see substep 5e. To evaluate the regional competency estimator, see 5h. To visualize examples of the regional competency maps, see substep 5i. Otherwise, you can skip to step 6. 
+If you have not done so already, download the models folder from [here](https://drive.google.com/drive/folders/1_oob1W8P_NH8YmVQNqvRDHeDdVz_FVWv?usp=share_link) and place it in the main directory (`parce`). This folder contains the default lunar image inpainting model, along with the model architectures and training parameters used to train the model. The trained regional competency estimator used in the paper is also contained in this folder, along with labels for the segmented OOD dataset provided. If you want to modify the configurations to train new models, go through the remaining steps in this section. To evaluate the image inpainting model, see substep 5e. To evaluate the regional competency estimator, see 5h. To visualize examples of the regional competency maps, see substep 5i. Finally, to compare our method to existing methods for anomaly localization, see substep 5j. Otherwise, you can skip to step 6. 
 
 ### 5b. Define the model architecture
 
@@ -305,6 +323,32 @@ python navigation/perception/competency/visualize.py regional --test_data lunar-
 ```
 
 The argument test_data is used to indicate which dataset should be used for visualization, which should be lunar-nav if you are using the default evaluation dataset. The argument model_dir is used to specify where your trained classification model was saved, and decoder_dir is used to specify where your trained image inpainting model was saved. You can optionally use the use_gpu flag if you want to visualize the competency maps using a GPU. This script will save figures of the input image, true labeled image (with the labels from 5g), and the regional competency model predictions to subfolders (id and ood) in a folder called competency in decoder_dir.
+
+### 5j. Competency regional competency maps to existing methods
+
+We compare our regional competency maps to a number of anomaly detection and localization methods, which are implemented in `navigation/perception/comparison/regional/methods.py`. We collect results for each method individually using the evaluate script in that folder:
+
+```
+python navigation/perception/comparison/regional/evaluate.py parce --save_file results/regional/parce.csv
+```
+
+In the command above, you can replace `parce` with each of the available methods (draem, fastflow, padim, patchcore, reverse, rkde, or stfpm) and select the CSV file where you would like to save the results for the partcicular method. You can optionally use the use_gpu flag to run evaluations on your GPU. To change the dataset, classification model, and inpainting model from their defaults, use the test_data, model_dir, and decoder_dir arguments. This command will save a CSV file of results to the file indicated by the save_file argument, along with a folder containing saved competency maps.
+
+After running evaluations for each of the methods, you can compare them using the compare script in the same folder:
+
+```
+python navigation/perception/comparison/regional/compare.py results/regional/
+```
+
+You should replace `results/regional/` with the folder where all of the evaluation files are stored. You should also specify the location of the saved OOD region labels using the decoder_dir argument (if they're not in the default location). This command will pull all of the CSV and data files from the given folder, read the results, calculate a number of performance metrics for each method, and print a table comparing the metrics to the terminal. It will also save figures of the score distributions for each method to the provided folder, along with ROC curves.
+
+You can also visualize the competency maps for each evaluated method using the visualize script:
+
+```
+python navigation/perception/comparison/regional/visualize.py results/regional/ --save_dir results/regional/visualize/ --example 0
+```
+
+You should replace `results/regional/` with the folder where all of the evaluation files are stored. This command will pull all of the CSV and data files from the given folder, visualize the generated competency maps, and save the figures to the folder specified by save_dir.
 
 ## 6) Estimate Vehicle Dynamics Model
 

@@ -92,7 +92,7 @@ def main():
 
             # Compute reconstruction losses and estimate competency scores
             output = output.detach().numpy()
-            scores, losses = estimator.comp_scores(X, output)
+            scores, losses = estimator.comp_scores_and_losses(X, output)
             correct_losses.append(losses[preds == trues])
             correct_scores.append(scores[preds == trues])
             incorrect_losses.append(losses[[not x for x in (preds == trues)]])
@@ -109,7 +109,7 @@ def main():
             output = output.detach().numpy()
 
             # Compute reconstruction losses and estimate competency scores
-            scores, losses = estimator.comp_scores(X, output)
+            scores, losses = estimator.comp_scores_and_losses(X, output)
             ood_losses.append(losses)
             ood_scores.append(scores.flatten())
 
@@ -137,7 +137,7 @@ def main():
             output = output.detach().numpy()
 
             # Compute reconstruction losses and estimate competency scores
-            scores, losses = estimator.comp_scores(X, output)
+            scores, losses = estimator.comp_scores_and_losses(X, output)
             id_losses.append(losses)
             id_scores.append(scores.flatten())
 
@@ -167,7 +167,7 @@ def main():
             output = output.detach().numpy()
 
             # Compute reconstruction losses and estimate competency scores
-            scores, losses = estimator.comp_scores(X, output)
+            scores, losses = estimator.comp_scores_and_losses(X, output)
 
             # Separate data into familiar and unfamiliar regions
             familiar_losses.append(losses[[(label == 0) for label in these_labels]])
