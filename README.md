@@ -71,9 +71,9 @@ rosbag record /mast_camera/image_raw
 
 ### 2c. Setup training dataset
 
-Extract the images from the bagfile using the export_images launch file in the bags folder:
+Extract the images from the bagfile using the export_images launch file in the perception utils folder:
 ```
-roslaunch export_imgs.launch bag:=<bag_file>
+roslaunch navigation/perception/utils/export_imgs.launch bag:=<bag_file>
 ```
 
 The parameter bag_file should be the name/location of the bagfile you collected in step 2b. By default, this command will save images to a folder called ~/.ros/. You can move the images to a more accessible folder using the following command:
