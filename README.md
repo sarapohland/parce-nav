@@ -1,6 +1,6 @@
-# Probabilistic and Reconstruction-Based Competency Estimation (PaRCE)
+# Competency-Aware Navigation
 
-This is the codebase for the paper titled [PaRCE: Probabilistic and Reconstruction-Based Competency Estimation for Safe Navigation Under Perception Uncertainty](https://arxiv.org/abs/2409.06111). This README describes how to reproduce the results achieved in this paper. 
+This is the codebase for the paper titled [Competency-Aware Planning for Probabilistically Safe Navigation Under Perception Uncertainty](https://arxiv.org/abs/2409.06111). This README describes how to reproduce the results achieved in this paper. 
 
 ## 0) Set Up Codebase
 
