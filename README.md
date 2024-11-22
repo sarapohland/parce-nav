@@ -8,17 +8,17 @@ This is the codebase for the paper titled [Competency-Aware Planning for Probabi
 
 Clone this repository:
 ```
-git clone https://github.com/sarapohland/parce.git
+git clone https://github.com/sarapohland/parce-nav.git
 ```
 
 ### 0b. Set up the navigation package
 
 It's recommended that you create an environment with Python 3.7:
 ```
-conda create -n parce python=3.7
+conda create -n parce-nav python=3.7
 ```
 
-Then, in the main folder (`parce`), run the following command:
+Then, in the main folder (`parce-nav`), run the following command:
 ```
 pip install -e .
 ```
@@ -50,7 +50,7 @@ Follow the [README](https://github.com/sarapohland/lunar-sim/blob/master/README.
 
 ### 2a. Download the dataset files
 
-To replicate the results presented in the paper, download the Lunar-Nav dataset file from the `data` folder available [here](https://drive.google.com/drive/folders/1_oob1W8P_NH8YmVQNqvRDHeDdVz_FVWv?usp=share_link). Create a folder called `data` in the  main directory (`parce`) and a subfolder called `Lunar-Nav`. Place the dataset file you downloaded into this subfolder. If you simply want to use the default lunar dataset, you can skip to step 3. If you want to create a new dataset from the lunar simulation environment, proceed through the rest of the substeps in this section.
+To replicate the results presented in the paper, download the Lunar-Nav dataset file from the `data` folder available [here](https://drive.google.com/drive/folders/1_oob1W8P_NH8YmVQNqvRDHeDdVz_FVWv?usp=share_link). Create a folder called `data` in the  main directory (`parce-nav`) and a subfolder called `Lunar-Nav`. Place the dataset file you downloaded into this subfolder. If you simply want to use the default lunar dataset, you can skip to step 3. If you want to create a new dataset from the lunar simulation environment, proceed through the rest of the substeps in this section.
 
 ### 2b. Collect training bags
 
@@ -64,7 +64,7 @@ Once the simulation is running, you can teleop the vehicle by running the follow
 rosrun teleop_twist_keyboard teleop_twist_keyboard.py
 ```
 
-It is recommended that you create a folder called `bags` in the main directory (`parce`), where bagfiles will be collected. To collect bags of data while controlling the vehicle, run the following from within the bags folder of a third terminal:
+It is recommended that you create a folder called `bags` in the main directory (`parce-nav`), where bagfiles will be collected. To collect bags of data while controlling the vehicle, run the following from within the bags folder of a third terminal:
 ```
 rosbag record /mast_camera/image_raw
 ```
@@ -138,7 +138,7 @@ Use the existing cases in the setup_dataloader script to enable the use of your 
 
 ### 3a. Download the model files
 
-Download the models folder from [here](https://drive.google.com/drive/folders/1_oob1W8P_NH8YmVQNqvRDHeDdVz_FVWv?usp=share_link) and place it in the main directory (`parce`). This folder contains the default lunar classification model for navigation, along with the model architectures and training parameters used to train the model. If you want to modify the configurations to train new models, go through the remaining steps in this section. To evaluate the classification model, see substep 3e. Otherwise, you can skip to step 4. 
+Download the models folder from [here](https://drive.google.com/drive/folders/1_oob1W8P_NH8YmVQNqvRDHeDdVz_FVWv?usp=share_link) and place it in the main directory (`parce-nav`). This folder contains the default lunar classification model for navigation, along with the model architectures and training parameters used to train the model. If you want to modify the configurations to train new models, go through the remaining steps in this section. To evaluate the classification model, see substep 3e. Otherwise, you can skip to step 4. 
 
 ### 3b. Define the model architecture
 
@@ -172,7 +172,7 @@ The argument test_data is used to indicate which dataset should be used to evalu
 
 ### 4a. Download the model files
 
-If you have not done so already, download the models folder from [here](https://drive.google.com/drive/folders/1_oob1W8P_NH8YmVQNqvRDHeDdVz_FVWv?usp=share_link) and place it in the main directory (`parce`). This folder contains the default lunar image reconstruction model, along with the model architectures and training parameters used to train the model. The trained overall competency estimator used in the paper is also contained in this folder. If you want to modify the configurations to train new models, go through the remaining steps in this section. To evaluate the reconstruction model, see substep 4e. To evaluate the overall competency estimator, see 4g. To visualize examples of overall model competency estimates, see substep 4h. Finally, to compare our method to existing methods for competency estimation, see substep 4i. Otherwise, you can skip to step 5. 
+If you have not done so already, download the models folder from [here](https://drive.google.com/drive/folders/1_oob1W8P_NH8YmVQNqvRDHeDdVz_FVWv?usp=share_link) and place it in the main directory (`parce-nav`). This folder contains the default lunar image reconstruction model, along with the model architectures and training parameters used to train the model. The trained overall competency estimator used in the paper is also contained in this folder. If you want to modify the configurations to train new models, go through the remaining steps in this section. To evaluate the reconstruction model, see substep 4e. To evaluate the overall competency estimator, see 4g. To visualize examples of overall model competency estimates, see substep 4h. Finally, to compare our method to existing methods for competency estimation, see substep 4i. Otherwise, you can skip to step 5. 
 
 ### 4b. Define the model architecture
 
@@ -254,7 +254,7 @@ You should replace `results/overall/` with the folder where all of the evaluatio
 
 ### 5a. Download the model files
 
-If you have not done so already, download the models folder from [here](https://drive.google.com/drive/folders/1_oob1W8P_NH8YmVQNqvRDHeDdVz_FVWv?usp=share_link) and place it in the main directory (`parce`). This folder contains the default lunar image inpainting model, along with the model architectures and training parameters used to train the model. The trained regional competency estimator used in the paper is also contained in this folder, along with labels for the segmented OOD dataset provided. If you want to modify the configurations to train new models, go through the remaining steps in this section. To evaluate the image inpainting model, see substep 5e. To evaluate the regional competency estimator, see 5h. To visualize examples of the regional competency maps, see substep 5i. Finally, to compare our method to existing methods for anomaly localization, see substep 5j. Otherwise, you can skip to step 6. 
+If you have not done so already, download the models folder from [here](https://drive.google.com/drive/folders/1_oob1W8P_NH8YmVQNqvRDHeDdVz_FVWv?usp=share_link) and place it in the main directory (`parce-nav`). This folder contains the default lunar image inpainting model, along with the model architectures and training parameters used to train the model. The trained regional competency estimator used in the paper is also contained in this folder, along with labels for the segmented OOD dataset provided. If you want to modify the configurations to train new models, go through the remaining steps in this section. To evaluate the image inpainting model, see substep 5e. To evaluate the regional competency estimator, see 5h. To visualize examples of the regional competency maps, see substep 5i. Finally, to compare our method to existing methods for anomaly localization, see substep 5j. Otherwise, you can skip to step 6. 
 
 ### 5b. Define the model architecture
 
@@ -354,7 +354,7 @@ You should replace `results/regional/` with the folder where all of the evaluati
 
 ### 6a. Download the model file
 
-To replicate the results presented in the paper, download the husky file from the `dynamics` folder available [here](https://drive.google.com/drive/folders/1_oob1W8P_NH8YmVQNqvRDHeDdVz_FVWv?usp=share_link). Create a folder called `dynamics` in the  main directory (`parce`) and place the dataset file you downloaded into this folder. If you simply want to use the default Husky dynamics model, you can skip to step 7. If you want to train a new dynamics model, proceed through the rest of the substeps in this section.
+To replicate the results presented in the paper, download the husky file from the `dynamics` folder available [here](https://drive.google.com/drive/folders/1_oob1W8P_NH8YmVQNqvRDHeDdVz_FVWv?usp=share_link). Create a folder called `dynamics` in the  main directory (`parce-nav`) and place the dataset file you downloaded into this folder. If you simply want to use the default Husky dynamics model, you can skip to step 7. If you want to train a new dynamics model, proceed through the rest of the substeps in this section.
 
 ### 6b. Define the controller parameters
 
@@ -399,7 +399,7 @@ The model_file should be the same file used for training in step 6c. The argumen
 
 ### 7a. Define the planning parameters
 
-To design the competency-aware path planning algorithm, you must specify the parameters for the planner in a configuration file like the examples given in `navigation/control/configs/`. If you simply want to run with the default planning parameters used for evaluation, you can use the config files provided in this folder, but you will need to change the file locations to match your (absolute) file paths. More details on the configurations are provided in the configs [README](https://github.com/sarapohland/parce/tree/main/navigation/control/configs/README.md). Note that you do not need to define all these parameters to evaluate the planning algorithm, but many are relevant.
+To design the competency-aware path planning algorithm, you must specify the parameters for the planner in a configuration file like the examples given in `navigation/control/configs/`. If you simply want to run with the default planning parameters used for evaluation, you can use the config files provided in this folder, but you will need to change the file locations to match your (absolute) file paths. More details on the configurations are provided in the configs [README](https://github.com/sarapohland/parce-nav/tree/main/navigation/control/configs/README.md). Note that you do not need to define all these parameters to evaluate the planning algorithm, but many are relevant.
 
 ### 7b. Evaluate the path planner
 
@@ -417,7 +417,7 @@ Alternatively, you can use the example argument to indicate a single example in 
 
 ### 8a. Define the controller parameters
 
-To design the path-tracking control algorithm, you must specify the parameters for the controller in a configuration file like the examples given in `navigation/control/configs/`. If you simply want to run with the default tracking parameters used for evaluation, you can use the config files provided in this folder, but you will need to change the file locations to match your (absolute) file paths. More details on the configurations are provided in the configs [README](https://github.com/sarapohland/parce/tree/main/navigation/control/configs/README.md). Note that you do not need to define all these parameters to evaluate the tracking algorithm, but many are relevant.
+To design the path-tracking control algorithm, you must specify the parameters for the controller in a configuration file like the examples given in `navigation/control/configs/`. If you simply want to run with the default tracking parameters used for evaluation, you can use the config files provided in this folder, but you will need to change the file locations to match your (absolute) file paths. More details on the configurations are provided in the configs [README](https://github.com/sarapohland/parce-nav/tree/main/navigation/control/configs/README.md). Note that you do not need to define all these parameters to evaluate the tracking algorithm, but many are relevant.
 
 ### 8b. Evaluate the tracking controller
 
@@ -439,7 +439,7 @@ The xml_file should be the configuration file chosen or created in the previous 
 
 ### 9a. Define the controller parameters
 
-You can specify the parameters for the competency-aware controller in a configuration file like the examples given in `navigation/control/configs/`. If you simply want to run with the default controller parameters used for evaluation, you can use the config files provided in this folder, but you will need to change the file locations to match your (absolute) file paths. More details on the configurations are provided in the configs [README](https://github.com/sarapohland/parce/tree/main/navigation/control/configs/README.md).
+You can specify the parameters for the competency-aware controller in a configuration file like the examples given in `navigation/control/configs/`. If you simply want to run with the default controller parameters used for evaluation, you can use the config files provided in this folder, but you will need to change the file locations to match your (absolute) file paths. More details on the configurations are provided in the configs [README](https://github.com/sarapohland/parce-nav/tree/main/navigation/control/configs/README.md).
 
 ### 9b. Run controller in lunar simulation
 
